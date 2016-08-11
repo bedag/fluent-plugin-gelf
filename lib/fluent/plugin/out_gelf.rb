@@ -45,7 +45,10 @@ class GELFOutput < BufferedOutput
   end
 
   def set_encoding(value)
-    value.force_encoding("utf-8")
+    if value.is_a?(String)
+      value.force_encoding("utf-8")
+    else
+      value
   end
 
   def format(tag, time, record)
