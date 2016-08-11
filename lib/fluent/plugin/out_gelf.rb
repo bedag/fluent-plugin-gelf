@@ -2,12 +2,13 @@ module Fluent
 
 class GELFOutput < BufferedOutput
 
-  Plugin.register_output("gelf", self)    
+  Plugin.register_output("gelf", self)
 
   config_param :use_record_host, :bool, :default => false
   config_param :add_msec_time, :bool, :default => false
   config_param :host, :string, :default => nil
   config_param :port, :integer, :default => 12201
+  config_param :input_encoding, :string, :default => ""
   config_param :protocol, :string, :default => 'udp'
 
   def initialize
@@ -44,10 +45,19 @@ class GELFOutput < BufferedOutput
     super
   end
 
+  def set_encoding(value)
+    if @input_encoding != "" and value.is_a?(String)
+      value.force_encoding(@input_encoding)
+    else
+      value
+    end
+  end
+
   def format(tag, time, record)
     gelfentry = { :timestamp => time, :_tag => tag }
 
     record.each_pair do |k,v|
+      v = set_encoding(v)
       case k
       when 'version' then
         gelfentry[:_version] = v
@@ -72,7 +82,7 @@ class GELFOutput < BufferedOutput
         end
       when 'msec' then
         # msec must be three digits (leading/trailing zeroes)
-        if @add_msec_time then 
+        if @add_msec_time then
           gelfentry[:timestamp] = "#{time.to_s}.#{v}".to_f
         else
           gelfentry[:_msec] = v
@@ -80,7 +90,7 @@ class GELFOutput < BufferedOutput
       when 'short_message', 'full_message', 'facility', 'line', 'file' then
         gelfentry[k] = v
       else
-        gelfentry['_'+k] = v
+        gelfentry["_#{k}".to_sym] = v
       end
     end
 
