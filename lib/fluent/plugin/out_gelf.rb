@@ -44,6 +44,14 @@ class GELFOutput < BufferedOutput
     super
   end
 
+  def set_encoding(value)
+    if value.is_a?(String)
+      value.force_encoding("utf-8")
+    else
+      value
+    end
+  end
+
   def format(tag, time, record)
     if defined? Fluent::EventTime and time.is_a? Fluent::EventTime then
       timestamp = time.sec + (time.nsec.to_f/1000000000).round(3)
@@ -54,6 +62,7 @@ class GELFOutput < BufferedOutput
     gelfentry = { :timestamp => timestamp, :_tag => tag }
 
     record.each_pair do |k,v|
+      v = set_encoding(v)
       case k
       when 'version' then
         gelfentry[:_version] = v
@@ -78,7 +87,7 @@ class GELFOutput < BufferedOutput
         end
       when 'msec' then
         # msec must be three digits (leading/trailing zeroes)
-        if @add_msec_time then 
+        if @add_msec_time then
           gelfentry[:timestamp] = "#{time.to_s}.#{v}".to_f
         else
           gelfentry[:_msec] = v
