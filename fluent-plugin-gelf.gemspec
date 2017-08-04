@@ -1,24 +1,31 @@
-# -*- encoding: utf-8 -*-
-$:.push File.expand_path("../lib", __FILE__)
+# coding: utf-8
+lib = File.expand_path('../lib', __FILE__)
+$LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
+require 'fluent/plugin/version'
 
-Gem::Specification.new do |s|
-  s.name        = "fluent-plugin-gelf"
-  s.version     = "0.1.0"
-  s.authors     = ["Eric Searcy"]
-  s.email       = ["emsearcy@gmail.com"]
-  s.homepage    = "https://github.com/emsearcy/fluent-plugin-gelf"
-  s.summary     = "Buffered fluentd output plugin to GELF (Graylog2)"
-  s.description = s.summary
-  s.licenses    = ["Apache-2.0"]
+Gem::Specification.new do |spec|
+  spec.name          = "fluent-plugin-gelf"
+  spec.version       = VERSION
+  spec.authors       = ["Eric Searcy"]
+  spec.email         = [""]
 
-  s.files         = `git ls-files`.split("\n")
-  s.test_files    = `git ls-files -- {test,spec,features}/*`.split("\n")
-  s.executables   = `git ls-files -- bin/*`.split("\n").map{ |f| File.basename(f) }
-  s.require_paths = ["lib"]
+  spec.summary       = %q{GELF plugin for Fluentd.}
+  spec.description   = %q{}
+  spec.homepage      = "https://github.com/emsearcy/fluent-plugin-gelf."
 
-  s.add_runtime_dependency "fluentd"
-  s.add_runtime_dependency "gelf"
-  s.add_runtime_dependency "string-scrub" if RUBY_VERSION.to_f < 2.1
-  s.add_development_dependency "rake"
-  s.add_development_dependency "test-unit"
+  # Prevent pushing this gem to RubyGems.org by setting 'allowed_push_host', or
+  # delete this section to allow pushing this gem to any host.
+  if spec.respond_to?(:metadata)
+    spec.metadata['allowed_push_host'] = "TODO: Set to 'http://mygemserver.com'"
+  else
+    raise "RubyGems 2.0 or newer is required to protect against public gem pushes."
+  end
+
+  spec.files         = `git ls-files -z`.split("\x0").reject { |f| f.match(%r{^(test|spec|features)/}) }
+  spec.bindir        = "exe"
+  spec.executables   = spec.files.grep(%r{^exe/}) { |f| File.basename(f) }
+  spec.require_paths = ["lib"]
+
+  spec.add_development_dependency "bundler", "~> 1.10"
+  spec.add_development_dependency "rake", "~> 10.0"
 end
